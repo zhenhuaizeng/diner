@@ -59,9 +59,12 @@ $f3->route('GET|POST /order1', function($f3){
         //Redirect to summary page
         $f3 -> reroute('order2');
     }
+    //Add meals to F3 hive
+    $f3->set('meals', getmeals());
+
     //Instantiate a view
     $view = new Template();
-    echo $view -> render("views/order1.html");
+    echo $view -> render('views/order1.html');
 });
 
 //Define a order2 route(328/diner/order2)
@@ -76,7 +79,7 @@ $f3->route('GET|POST /order2', function($f3){
         //Redirect to summary page
         $f3->reroute('summary');
     }
-
+    $f3->set('condiments',getCondiments());
     $view = new Template();
     echo $view -> render("views/order2.html");
 });
