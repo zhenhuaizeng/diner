@@ -11,8 +11,8 @@ error_reporting(E_ALL);
 
 //Require autoload file
 require_once('vendor/autoload.php');
-require_once('model/data-layer.php');
-require_once('model/validate.php');
+//require_once('model/data-layer.php');
+//require_once('model/validate.php');
 //require_once('classes/order.php');
 
 //Start a session AFTER requiring autoload.php
@@ -45,12 +45,13 @@ echo validFood($food3) ? "valid" : "not valid";
 //Instantiate F3 Base class
 $f3 = Base::instance();
 
+//Instantiate a Controller object
+$con = new Controller($f3);
+
 //Define a default route(328/diner)
 $f3->route('GET /', function(){
+    $GLOBALS['con']->home();
 
-    //Instantiate a view
-    $view = new Template();
-    echo $view -> render("views/diner-home.html");
 });
 
 //Define a breakfast route(328/diner/breakfast)
@@ -72,56 +73,7 @@ $f3->route('GET /lunch', function(){
 //Define a lunch route(328/diner/breakfast)
 $f3->route('GET|POST /order1', function($f3){
 
-
-   // var_dump($_POST);
-    //If the form has been posted
-    if($_SERVER['REQUEST_METHOD'] == 'POST')
-    {
-
-        $newOrder = new Order();
-
-
-
-        //move data from POST array to SESSION array
-        $food = trim($_POST['food']);
-        if(validFood($food))
-        {
-            $newOrder->setFood($food);
-        }
-        else
-        {
-            $f3->set('errors["food"]','Food must have at least 2 chars ');
-        }
-
-        //Validate the meal
-        $meal = $_POST['meal'];
-        if(validMeal($meal))
-        {
-            //change
-            $newOrder->setMeal($meal);
-
-
-        }
-        else
-        {
-            $f3->set('errors["meal"]','Meal is invalid');
-        }
-
-        //Redirect to summary page
-        //if there are no errors
-        if(empty($f3->get('errors')))
-        {
-            $_SESSION['newOrder'] = $newOrder;
-            $f3 ->reroute('order2');
-        }
-    }
-    //Add meals to F3 hive
-    $f3->set('meals', getmeals());
-
-
-    //Instantiate a view
-    $view = new Template();
-    echo $view -> render('views/order1.html');
+    $GLOBALS['con']->order1();
 });
 
 //Define a order2 route(328/diner/order2)
@@ -142,7 +94,7 @@ $f3->route('GET|POST /order2', function($f3){
         //Redirect to summary page
         $f3->reroute('summary');
     }
-    $f3->set('condiments',getCondiments());
+    $f3->set('condiments',DataLayer::getCondiments());
     $view = new Template();
     echo $view -> render("views/order2.html");
 });
@@ -156,7 +108,7 @@ $f3->route('GET /summary', function(){
     $view = new Template();
     echo $view -> render("views/summary.html");
 
-    //Destroy session array
+    //Destroy session array so the data won't be saved. order 1 = break, order 2 = breakfast.
     session_destroy();
 });
 

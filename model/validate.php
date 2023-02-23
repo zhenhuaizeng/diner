@@ -1,8 +1,11 @@
 <?php
+class Validate
+{
+
 
     //Return true if the food has at least
     //two characters
-    function validFood($food)
+    static function validFood($food)
     {
         /*
         if (strlen($food) <= 2)
@@ -19,7 +22,7 @@
 
 
     //Make sure user's meal is valid
-    function validMeal($meal)
+    static function validMeal($meal)
     {
         /*if(in_array($meal,getMeals()))
         {
@@ -29,5 +32,7 @@
         {
             return false;
         }*/
-        return in_array($meal,getMeals());
+        //invoke static method
+        return in_array($meal, DataLayer::getMeals());
     }
+}
